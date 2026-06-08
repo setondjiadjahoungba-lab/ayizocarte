@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carte de Membre – Association Ayizo Kogbe Na Yi Nukon</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Raleway:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --blue:   #1D3297;
+      --red:    #A74A3D;
+      --gold:   #D4A017;
+      --dark:   #0f1120;
+      --card-bg:#ffffff;
+      --border: #e2e8f0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: var(--dark);
+      background-image:
+        radial-gradient(ellipse at 10% 10%, rgba(29,50,151,0.35) 0%, transparent 55%),
+        radial-gradient(ellipse at 90% 90%, rgba(167,74,61,0.25) 0%, transparent 55%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem 4rem;
+      color: #fff;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown 0.7s ease both;
+    }
+    .page-header .assoc-logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      margin-bottom: 1rem;
+      box-shadow: 0 0 24px rgba(212,160,23,0.4);
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+      color: #fff;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+    .page-header h2 {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-top: 0.4rem;
+    }
+
+    /* ── MAIN CARD ── */
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 2.2rem 2rem;
+      width: 100%;
+      max-width: 520px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+      animation: fadeUp 0.7s ease 0.15s both;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(212,160,23,0.25);
+    }
+
+    /* ── PHOTO UPLOAD ── */
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .photo-upload-label {
+      width: 130px;
+      height: 150px;
+      border: 2px dashed rgba(212,160,23,0.5);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(29,50,151,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .photo-upload-label:hover {
+      border-color: var(--gold);
+      background: rgba(212,160,23,0.08);
+    }
+    .photo-upload-label img#photo-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0; left: 0;
+      border-radius: 10px;
+      display: none;
+    }
+    .photo-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+      text-align: center;
+      padding: 0 0.5rem;
+    }
+    .photo-placeholder .icon { font-size: 2rem; }
+    #photo-input { display: none; }
+
+    /* ── FORM FIELDS ── */
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .field-full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 0.35rem;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      color: #fff;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.88rem;
+      transition: border-color 0.3s, background 0.3s;
+      outline: none;
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.25); }
+    .field input:focus, .field select:focus {
+      border-color: var(--gold);
+      background: rgba(212,160,23,0.06);
+    }
+    .field select option { background: #1a2050; color: #fff; }
+
+    /* ── COTISATION SECTION ── */
+    .cotisation-box {
+      background: rgba(29,50,151,0.25);
+      border: 1px solid rgba(29,50,151,0.5);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.5rem;
+    }
+    .cotisation-box .amount {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      font-weight: 900;
+      text-align: center;
+      margin: 0.4rem 0 0.2rem;
+    }
+    .cotisation-box .amount span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+    }
+    .cotisation-box .instruction {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      line-height: 1.5;
+      margin-top: 0.5rem;
+    }
+    .cotisation-box .numero {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-top: 0.4rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── API MOBILE MONEY ── */
+    .api-section {
+      background: rgba(167,74,61,0.12);
+      border: 1px dashed rgba(167,74,61,0.4);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.8rem;
+    }
+    .api-section .api-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #e07060;
+      margin-bottom: 0.8rem;
+    }
+    .api-section .api-placeholder {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Courier New', monospace;
+      line-height: 1.6;
+    }
+    .api-section .api-note {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.35);
+      margin-top: 0.6rem;
+      font-style: italic;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+    }
+    .btn {
+      flex: 1;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-preview {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .btn-preview:hover { background: rgba(255,255,255,0.14); }
+    .btn-download {
+      background: linear-gradient(135deg, var(--gold), #b8860b);
+      color: #0f1120;
+      box-shadow: 0 4px 16px rgba(212,160,23,0.35);
+    }
+    .btn-download:hover { box-shadow: 0 8px 24px rgba(212,160,23,0.5); }
+
+    /* ── CARTE PREVIEW (rendu PDF) ── */
+    #carte-preview {
+      display: none;
+      margin-top: 2rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    #carte-preview .preview-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    /* La carte physique */
+    #carte-visuelle {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, var(--blue) 0%, #0d1f6e 100%);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      border: 2px solid rgba(212,160,23,0.4);
+      position: relative;
+      padding: 1.4rem;
+    }
+    #carte-visuelle::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(212,160,23,0.08);
+      border-radius: 50%;
+    }
+    #carte-visuelle::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: -30px;
+      width: 120px; height: 120px;
+      background: rgba(167,74,61,0.1);
+      border-radius: 50%;
+    }
+
+    .carte-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(212,160,23,0.3);
+      padding-bottom: 0.8rem;
+    }
+    .carte-logo {
+      width: 44px; height: 44px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+    }
+    .carte-header-text h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .carte-header-text p {
+      font-size: 0.6rem;
+      color: var(--gold);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+
+    .carte-body {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .carte-photo {
+      width: 80px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.1);
+    }
+    .carte-infos { flex: 1; }
+    .carte-infos .info-row {
+      margin-bottom: 0.35rem;
+    }
+    .carte-infos .info-label {
+      font-size: 0.5rem;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .carte-infos .info-value {
+      font-size: 0.72rem;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .carte-footer {
+      margin-top: 0.9rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid rgba(212,160,23,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .carte-footer .membre-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.65rem;
+      color: var(--gold);
+    }
+    .carte-footer .cotis-badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- EN-TÊTE -->
+  <div class="page-header">
+    <img class="assoc-logo" src="https://res.cloudinary.com/dernvf30u/image/upload/v1780672525/logo.jnp_txeang.jpg" alt="Logo Association" onerror="this.style.display='none'">
+    <h1>Association Ayizo Kogbe Na Yi Nukon</h1>
+    <h2>Carte de Membre</h2>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <div class="card">
+
+    <!-- Photo -->
+    <p class="section-title">Photo du membre</p>
+    <div class="photo-section">
+      <label class="photo-upload-label" for="photo-input">
+        <img id="photo-preview" src="" alt="Photo">
+        <div class="photo-placeholder">
+          <span class="icon">👤</span>
+          <span>Clique pour<br>ajouter ta photo</span>
+        </div>
+      </label>
+      <input type="file" id="photo-input" accept="image/*">
+    </div>
+
+    <!-- Informations personnelles -->
+    <p class="section-title">👤 Informations personnelles</p>
+    <div class="fields-grid">
+      <div class="field">
+        <label>Nom</label>
+        <input type="text" id="nom" placeholder="Ex: ADJAHOUNGBA">
+      </div>
+      <div class="field">
+        <label>Prénom</label>
+        <input type="text" id="prenom" placeholder="Ex: Emmanuel">
+      </div>
+      <div class="field field-full">
+        <label>Profession</label>
+        <input type="text" id="profession" placeholder="Ex: Traducteur biblique">
+      </div>
+      <div class="field">
+        <label>Commune de résidence</label>
+        <input type="text" id="commune" placeholder="Ex: Zè">
+      </div>
+      <div class="field">
+        <label>Arrondissement</label>
+        <input type="text" id="arrondissement" placeholder="Ex: Zè-centre">
+      </div>
+      <div class="field field-full">
+        <label>Téléphone</label>
+        <input type="tel" id="telephone" placeholder="Ex: +229 01 XX XX XX XX">
+      </div>
+    </div>
+
+    <!-- Cotisation -->
+    <p class="section-title">💰 Cotisation statutaire</p>
+    <div class="cotisation-box">
+      <div class="amount">1 000 <span>FCFA</span></div>
+      <div class="instruction">
+        Envoyez votre cotisation par Mobile Money au numéro ci-dessous<br>
+        avec votre <strong>nom complet</strong> en référence :
+      </div>
+      <div class="numero">📱 0156982604</div>
+    </div>
+
+    <!-- Zone API Mobile Money -->
+    <p class="section-title">🔌 Intégration API Mobile Money</p>
+    <div class="api-section">
+      <div class="api-title">⚙️ Espace réservé — API opérateur</div>
+      <div class="api-placeholder">
+        // Collez ici les paramètres de votre API<br>
+        // MTN Mobile Money ou Moov Money<br><br>
+        const apiConfig = &#123;<br>
+        &nbsp;&nbsp;endpoint: "VOTRE_URL_API",<br>
+        &nbsp;&nbsp;apiKey:   "VOTRE_CLE_API",<br>
+        &nbsp;&nbsp;montant:  1000,<br>
+        &nbsp;&nbsp;devise:   "XOF"<br>
+        &#125;;
+      </div>
+      <div class="api-note">
+        * Une fois votre contrat signé avec l'opérateur, remplacez ce bloc par le code fourni.
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="btn-row">
+      <button class="btn btn-preview" onclick="genererApercu()">👁 Aperçu</button>
+      <button class="btn btn-download" onclick="telechargerPDF()">⬇ Télécharger PDF</button>
+    </div>
+
+  </div>
+
+  <!-- APERÇU CARTE -->
+  <div id="carte-preview">
+    <p class="preview-label">✦ Aperçu de votre carte ✦</p>
+    <div id="carte-visuelle">
+      <div class="carte-header">
+        <img class="carte-logo" src="https://res.cloudinary.com/dernvf30u/image/upload/v1780672525/logo.jnp_txeang.jpg" alt="Logo" onerror="this.style.display='none'">
+        <div class="carte-header-text">
+          <h3>Association Ayizo<br>Kogbe Na Yi Nukon</h3>
+          <p>Carte de Membre</p>
+        </div>
+      </div>
+      <div class="carte-body">
+        <img class="carte-photo" id="carte-photo-rendu" src="" alt="Photo membre">
+        <div class="carte-infos">
+          <div class="info-row">
+            <div class="info-label">Nom complet</div>
+            <div class="info-value" id="carte-nom">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Profession</div>
+            <div class="info-value" id="carte-profession">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Commune</div>
+            <div class="info-value" id="carte-commune">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Arrondissement</div>
+            <div class="info-value" id="carte-arrondissement">—</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Téléphone</div>
+            <div class="info-value" id="carte-telephone">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="carte-footer">
+        <span class="membre-num" id="carte-num">N° MBR-2026-0001</span>
+        <span class="cotis-badge">Cotisation : 1 000 FCFA</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>Plateforme conçue par <strong>A. Emmanuel ADJAHOUNGBA</strong></footer>
+
+  <script>
+    let photoDataUrl = null;
+
+    // ── Chargement photo ──
+    document.getElementById('photo-input').addEventListener('change', function() {
+      const f = this.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        photoDataUrl = e.target.result;
+        const prev = document.getElementById('photo-preview');
+        prev.src = photoDataUrl;
+        prev.style.display = 'block';
+        document.querySelector('.photo-placeholder').style.display = 'none';
+      };
+      reader.readAsDataURL(f);
+    });
+
+    // ── Générer un numéro de membre aléatoire ──
+    function genNumMembre() {
+      return 'MBR-2026-' + String(Math.floor(Math.random() * 900) + 100);
+    }
+
+    // ── Remplir la carte aperçu ──
+    function remplirCarte() {
+      const nom        = document.getElementById('nom').value.trim();
+      const prenom     = document.getElementById('prenom').value.trim();
+      const profession = document.getElementById('profession').value.trim();
+      const commune    = document.getElementById('commune').value.trim();
+      const arrond     = document.getElementById('arrondissement').value.trim();
+      const tel        = document.getElementById('telephone').value.trim();
+
+      document.getElementById('carte-nom').textContent         = (nom && prenom) ? `${prenom} ${nom}` : '—';
+      document.getElementById('carte-profession').textContent  = profession || '—';
+      document.getElementById('carte-commune').textContent     = commune || '—';
+      document.getElementById('carte-arrondissement').textContent = arrond || '—';
+      document.getElementById('carte-telephone').textContent   = tel || '—';
+      document.getElementById('carte-num').textContent         = 'N° ' + genNumMembre();
+
+      if (photoDataUrl) {
+        document.getElementById('carte-photo-rendu').src = photoDataUrl;
+      }
+    }
+
+    // ── Aperçu ──
+    function genererApercu() {
+      remplirCarte();
+      const preview = document.getElementById('carte-preview');
+      preview.style.display = 'block';
+      preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Téléchargement PDF ──
+    function telechargerPDF() {
+      remplirCarte();
+
+      const { jsPDF } = window.jspdf;
+      // Carte format ID (85.6 x 54 mm) en landscape
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85.6, 54] });
+
+      const W = 85.6;
+      const H = 54;
+
+      // Fond bleu
+      doc.setFillColor(29, 50, 151);
+      doc.rect(0, 0, W, H, 'F');
+
+      // Bande dorée en haut
+      doc.setFillColor(212, 160, 23);
+      doc.rect(0, 0, W, 2, 'F');
+
+      // Bande dorée en bas
+      doc.rect(0, H - 2, W, 2, 'F');
+
+      // Titre association
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(5.5);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ASSOCIATION AYIZO KOGBE NA YI NUKON', W / 2, 7, { align: 'center' });
+
+      // Sous-titre
+      doc.setTextColor(212, 160, 23);
+      doc.setFontSize(4.5);
+      doc.setFont('helvetica', 'normal');
+      doc.text('CARTE DE MEMBRE', W / 2, 10.5, { align: 'center' });
+
+      // Ligne séparatrice
+      doc.setDrawColor(212, 160, 23);
+      doc.setLineWidth(0.3);
+      doc.line(5, 12.5, W - 5, 12.5);
+
+      // Photo
+      if (photoDataUrl) {
+        try {
+          doc.addImage(photoDataUrl, 'JPEG', 5, 15, 18, 22, '', 'FAST');
+          // Bordure dorée photo
+          doc.setDrawColor(212, 160, 23);
+          doc.setLineWidth(0.4);
+          doc.rect(5, 15, 18, 22);
+        } catch(e) {}
+      }
+
+      // Infos texte
+      const nom        = document.getElementById('nom').value.trim();
+      const prenom     = document.getElementById('prenom').value.trim();
+      const profession = document.getElementById('profession').value.trim();
+      const commune    = document.getElementById('commune').value.trim();
+      const arrond     = document.getElementById('arrondissement').value.trim();
+      const tel        = document.getElementById('telephone').value.trim();
+
+      const startX = 26;
+      let   y      = 17;
+
+      const addField = (label, value) => {
+        doc.setTextColor(180, 190, 220);
+        doc.setFontSize(3.8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(label.toUpperCase(), startX, y);
+        y += 3;
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'bold');
+        doc.text(value || '—', startX, y);
+        y += 4.5;
+      };
+
+      addField('Nom complet', prenom && nom ? `${prenom} ${nom}` : (nom || prenom));
+      addField('Profession', profession);
+      addField('Commune / Arrondissement', commune && arrond ? `${commune} — ${arrond}` : (commune || arrond));
+      addField('Téléphone', tel);
+
+      // Ligne basse
+      doc.setDrawColor(212, 160, 23);
+      doc.setLineWidth(0.2);
+      doc.line(5, H - 9, W - 5, H - 9);
+
+      // Numéro membre
+      doc.setTextColor(212, 160, 23);
+      doc.setFontSize(4);
+      doc.setFont('helvetica', 'bold');
+      doc.text('N° ' + genNumMembre(), 6, H - 5.5);
+
+      // Cotisation
+      doc.setFillColor(167, 74, 61);
+      doc.roundedRect(W - 30, H - 9.5, 25, 6, 1, 1, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(4);
+      doc.text('Cotisation : 1 000 FCFA', W - 17.5, H - 5.8, { align: 'center' });
+
+      // Sauvegarde
+      const nomFichier = (prenom && nom)
+        ? `carte-membre-${prenom}-${nom}.pdf`.replace(/\s+/g, '-')
+        : 'carte-membre-ayizo.pdf';
+
+      doc.save(nomFichier);
+    }
+  </script>
+
+</body>
+</html>
